@@ -81,31 +81,31 @@ module.exports = {
     );
   }
   export default function Wrapper({ children, theme }: any) {
-    const colorModeManager: StorageManager = {
-      get: async () => {
-        try {
-          const val = await localStorage.getItem("@example-wrapper-mode");
-          return val === "dark" ? "dark" : "light";
-        } catch (e) {
-          console.log(e);
-          return "light";
-        }
-      },
-      set: async (value: ColorMode) => {
-        try {
-          //@ts-ignore
+    // const colorModeManager: StorageManager = {
+    //   get: async () => {
+    //     try {
+    //       const val = await localStorage.getItem("@example-wrapper-mode");
+    //       return val === "dark" ? "dark" : "light";
+    //     } catch (e) {
+    //       console.log(e);
+    //       return "light";
+    //     }
+    //   },
+    //   set: async (value: ColorMode) => {
+    //     try {
+    //       //@ts-ignore
   
-          await localStorage.setItem("@example-wrapper-mode", value);
-        } catch (e) {
-          console.log(e);
-        }
-      },
-    };
+    //       await localStorage.setItem("@example-wrapper-mode", value);
+    //     } catch (e) {
+    //       console.log(e);
+    //     }
+    //   },
+    // };
     return (
       <NativeBaseProvider
         theme={myTheme}
         config={Config}
-        colorModeManager={colorModeManager}
+        // colorModeManager={colorModeManager}
         initialWindowMetrics={{
           frame: { x: 0, y: 0, width: 0, height: 0 },
           insets: { top: 0, left: 0, right: 0, bottom: 0 },

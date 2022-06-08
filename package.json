@@ -4,9 +4,12 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
+    "@expo/vector-icons": "^13.0.0",
+    "@react-native-async-storage/async-storage": "^1.17.6",
     "ejs": "^3.1.8",
     "express": "^4.18.1",
     "open-terminal": "^0.1.11",
+    "prettier": "^2.6.2",
     "prompts": "^2.4.2",
     "shelljs": "^0.8.5",
     "typescript": "^4.6.4"
