@@ -8,6 +8,22 @@ const path = require("path");
 var fs = require("fs");
 const prettier = require("prettier");
 
+let reactNativeVectorIconsArray = [
+  "AntDesign",
+  "Entypo",
+  "EvilIcons",
+  "Feather",
+  "FontAwesome",
+  "MaterialCommunityIcons",
+  "Fontisto",
+  "Foundation",
+  "Ionicons",
+  "MaterialIcons",
+  "Octicons",
+  "Zocial",
+  "SimpleLineIcons",
+];
+
 function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
@@ -110,7 +126,7 @@ async function createFileSync(dir) {
           getModifiedData(data, dir)
         );
       } else {
-        writeFile(path, data, () => {});
+        writeFile(path, getData(data), () => {});
       }
       resolve("Files created");
     } catch (err) {
@@ -119,6 +135,86 @@ async function createFileSync(dir) {
       reject(err);
     }
   });
+}
+
+function getData(data) {
+  if (!data.includes("@expo/vector-icons")) {
+    return data;
+  }
+  let regex = /import \{((.|\n)*)icons\'\;/gm;
+  let matches = data.match(regex);
+  let otherImports = getOtherImports(matches);
+
+  if (matches != null) {
+    for (let i = 0; i < matches.length; i++) {
+      let res = checkIcons(matches[i]);
+      let icon = getIcon(res, otherImports);
+      data = data.replace(matches[i], icon);
+    }
+  }
+  return data;
+}
+
+function getOtherImports(matches) {
+  let regex = /import \{((.|\n)*)base\'\;/gm;
+  for (let i = 0; i < matches.length; i++) {
+    return matches[i].match(regex);
+  }
+  // console.log(matches);
+}
+
+function checkIcons(match) {
+  let arr = [];
+  for (let i = 0; i < reactNativeVectorIconsArray.length; i++) {
+    if (match.includes(reactNativeVectorIconsArray[i])) {
+      arr.push(reactNativeVectorIconsArray[i]);
+    }
+  }
+  return arr;
+}
+
+function getIcon(iconsArr, otherImports) {
+  // var icons = matches.substring(
+  //   matches.indexOf("{") + 1,
+  //   matches.lastIndexOf("}")
+  // );
+  let finalImport = "";
+  for (let i = 0; i < iconsArr.length; i++) {
+    finalImport =
+      finalImport +
+      "import " +
+      iconsArr[i] +
+      " from 'react-native-vector-icons/dist/" +
+      iconsArr[i].trim() +
+      "';\n";
+  }
+  for (let i = 0; i < otherImports.length; i++) {
+    finalImport = finalImport + otherImports[i];
+  }
+
+  // if (icons.includes(",")) {
+  //   let iconsArr = icons.split(",");
+
+  //   for (let i = 0; i < iconsArr.length; i++) {
+  //     finalImport =
+  //       finalImport +
+  //       "import " +
+  //       iconsArr[i] +
+  //       " from 'react-native-vector-icons/dist/" +
+  //       iconsArr[i].trim() +
+  //       "';\n";
+  //   }
+  //   console.log(finalImport, iconsArr);
+  // } else {
+  //   finalImport =
+  //     finalImport +
+  //     "import " +
+  //     icons +
+  //     " from 'react-native-vector-icons/dist/" +
+  //     icons.trim() +
+  //     "';\n";
+  // }
+  return finalImport;
 }
 
 function getModifiedData(data, path) {
@@ -177,14 +273,27 @@ function replaceTemplate(data, componentsList, path) {
   
     export { ${componentsList} };
     `;
+    if (path.includes("Responsive")) {
+      template = `export default {
+        title: "${storybookPath}",
+        decorators: [
+          (Story: any) => (
+            <Wrapper>
+              <Story />
+            </Wrapper>
+          ),
+        ],
+      } as Meta;
+    
+      export { ${componentsList} };
+      `;
+    }
   } else if (
     path.includes("useColorMode") ||
     path.includes("useColorModeValue") ||
     path.includes("useSafeArea")
   ) {
     template = `
-    import { View } from 'react-native';
-    
     export default {
       title: "${storybookPath}",
       decorators: [
@@ -266,25 +375,35 @@ function updateTemplate(directoryPath) {
       return console.log("Unable to scan directory: " + err);
     }
     files.forEach(function (file) {
+      // console.log(directoryPath + "/" + file);
       if (fs.statSync(directoryPath + "/" + file).isDirectory()) {
         updateTemplate(directoryPath + "/" + file);
       } else {
         if (file == "Wrapper.ts") {
           updateTheme(directoryPath + "/" + file);
         } else {
+          let str = directoryPath + "/" + file;
+          // console.log(
+          //   path.join(__dirname, "/../templates"),
+          //   "CONNNSOLLLEEE",
+          //   str.replace(path.join(__dirname, "/../templates"), storybookPath)
+          // );
           let html = ejs.render(
             require(directoryPath + "/" + file).template,
             require(directoryPath + "/" + file).params
           );
-
-          fs.appendFileSync(
-            storybookPath +
-              file.split(".")[0] +
-              "/" +
-              file.split(".")[0] +
-              ".stories.tsx",
+          fs.writeFileSync(
+            str.replace(path.join(__dirname, "/../templates"), storybookPath),
             html
           );
+          // fs.appendFileSync(
+          //  +
+          //     file.split(".")[0] +
+          //     "/" +
+          //     file.split(".")[0] +
+          //     ".stories.tsx",
+          //   html
+          // );
         }
       }
     });
