@@ -1,31 +1,36 @@
 const theme = {
   foundation: {
     colors: {
+      newColor: {
+        "50": "#2878ff",
+        "100": "#2570ff",
+        "200": "#2368f3",
+        "300": "#2060e0",
+        "400": "#1d58cd",
+        "500": "#1b50bb",
+        "600": "#1848a8",
+        "700": "#153e91",
+        "800": "#11347b",
+        "900": "#0e2b64",
+      },
       primary: {
-        50: "#fdf2f8",
-        100: "#fce7f3",
-        200: "#fbcfe8",
-        300: "#f9a8d4",
-        400: "#f472b6",
-        500: "#ec4899",
-        600: "#db2777",
-        700: "#be185d",
-        800: "#005885",
-        900: "#003F5E",
+        "50": "#2878ff",
+        "100": "#2570ff",
+        "200": "#2368f3",
+        "300": "#2060e0",
+        "400": "#1d58cd",
+        "500": "#1b50bb",
+        "600": "#1848a8",
+        "700": "#153e91",
+        "800": "#11347b",
+        "900": "#0e2b64",
       },
-      amber: {
-        400: "#d97706",
-      },
-    },
-    sizes: {
-      "2xl": "45",
     },
   },
   components: {
     Button:
-      "{variants: {rounded: ({ colorScheme }) => {return {bg: `${colorScheme}.500`,rounded: 'full',};},},}",
-    Heading:
-      "{baseStyle: ({ colorMode }) => {return {color: colorMode === 'dark' ? 'red.300' : 'blue.300',fontWeight: 'normal',};},}",
+      '{\n  variants: {\n          rounded: ({\n            colorScheme\n          }) => {\n            return {\n              bg: `${colorScheme}.500`,\n              rounded: "full"\n            };\n          }\n        }}',
+    Checkbox: '{\nsizes:{\n"xl":{boxSize:"20"}}\n}',
   },
 };
 

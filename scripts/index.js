@@ -38,10 +38,7 @@ let exportedComp;
 function getAllStories() {
   let regex = "/{([^}]*)}/";
   shell.series(
-    [
-      // "git clone git@github.com:GeekyAnts/NativeBase.git"
-      "ls -a",
-    ],
+    ["git clone git@github.com:GeekyAnts/NativeBase.git"],
     async function (err) {
       if (err) {
         console.log("Build Failed", err);
@@ -145,21 +142,51 @@ function getData(data) {
   let matches = data.match(regex);
   let otherImports = getOtherImports(matches);
 
+  let newMatches = matches[0].split("\n");
+  // getImports(newMatches);
+  let str = matches[0].split("\n").join("");
+  let allImports = str.split(";");
+  allImports.pop();
+  // console.log(allImports);
+  let imports = "";
   if (matches != null) {
-    for (let i = 0; i < matches.length; i++) {
-      let res = checkIcons(matches[i]);
-      let icon = getIcon(res, otherImports);
-      data = data.replace(matches[i], icon);
+    for (let i = 0; i < allImports.length; i++) {
+      // console.log(allImports[i].includes("@expo/vector-icons"));
+      if (allImports[i].includes("@expo/vector-icons")) {
+        let res = checkIcons(allImports[i]);
+        let icon = getIcon(res, otherImports);
+        imports = imports + icon + "\n";
+      } else {
+        imports = imports + allImports[i] + "\n";
+      }
     }
+    data = data.replace(matches[0], imports);
+    // console.log(imports);
   }
   return data;
 }
 
+function getImports(matches) {
+  let i = 0;
+  let arr = [];
+  console.log(matches);
+  // while (i <= matches.length) {
+  //   let str = "";
+  //   while (!matches[i].includes("from '")) {
+  //     str = str + matches[i];
+  //     i++;
+  //   }
+  //   arr.push(str);
+  //   i++;
+  // }
+  // console.log()
+}
+
 function getOtherImports(matches) {
   let regex = /import \{((.|\n)*)base\'\;/gm;
-  for (let i = 0; i < matches.length; i++) {
-    return matches[i].match(regex);
-  }
+
+  return matches[0].match(regex);
+
   // console.log(matches);
 }
 
@@ -173,7 +200,7 @@ function checkIcons(match) {
   return arr;
 }
 
-function getIcon(iconsArr, otherImports) {
+function getIcon(iconsArr) {
   // var icons = matches.substring(
   //   matches.indexOf("{") + 1,
   //   matches.lastIndexOf("}")
@@ -187,9 +214,6 @@ function getIcon(iconsArr, otherImports) {
       " from 'react-native-vector-icons/dist/" +
       iconsArr[i].trim() +
       "';\n";
-  }
-  for (let i = 0; i < otherImports.length; i++) {
-    finalImport = finalImport + otherImports[i];
   }
 
   // if (icons.includes(",")) {
